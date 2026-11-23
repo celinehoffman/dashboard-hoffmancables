@@ -48,7 +48,7 @@ Aucune dépendance npm et aucune étape de build : Vercel sert la page et exécu
 Depuis janvier 2026, les nouvelles apps se créent dans le **Dev Dashboard** :
 
 1. *Admin Shopify → Paramètres → Applications → Développer des applications* → Dev Dashboard → créer une app.
-2. Scopes Admin API : `read_orders`, `read_products`, `read_customers`. Ajoute `read_all_orders` pour comparer à plus de 60 jours (N-1).
+2. Portées (scopes) : **`read_orders` uniquement** — aucune donnée client n'est lue. Ajoute `read_all_orders` pour comparer à plus de 60 jours (N-1).
 3. Installe l'app sur la boutique, puis récupère le **Client ID** et le **Client secret**.
 
 (Si une ancienne custom app existe déjà avec un jeton `shpat_…`, `SHOPIFY_ADMIN_TOKEN` suffit.)
@@ -71,6 +71,6 @@ Redéploie ensuite le projet. Le pied de page indique l'état de chaque source (
 ## Limites connues
 
 - Search Console : les 2 à 3 derniers jours sont souvent incomplets.
-- « Nouveaux / récurrents » Shopify : approximation basée sur le nombre total de commandes actuel du client.
+- Sécurité : mot de passe de 12 caractères minimum, blocage 15 min après 5 essais ratés, mot de passe jamais stocké dans le navigateur, en-têtes CSP / anti-iframe / HSTS.
 - Le CA affiché est celui de Shopify (TTC, frais de port inclus, hors commandes test et annulées). Sans Shopify, c'est le `purchaseRevenue` de GA4.
 - GA4 sous-compte les achats quand le visiteur refuse les cookies : l'écart avec Shopify est normal.
