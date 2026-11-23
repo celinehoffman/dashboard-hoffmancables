@@ -16,129 +16,158 @@
 <body>
   <div class="announce"><strong>Hoffman Cable</strong> · Tableau de bord marketing de hoffmancables.shop</div>
 
-  <header class="top">
-    <div class="wrap">
+  <div class="shell">
+    <!-- Menu latéral -->
+    <aside class="side" aria-label="Sections du dashboard">
       <a class="brand" href="https://www.hoffmancables.shop/" target="_blank" rel="noopener">
-        <img src="https://www.hoffmancables.shop/cdn/shop/files/Logo_Hoffman_Cable.png?width=180" alt="Hoffman Cable">
-        <h1>Pilotage marketing <small>SEO · Trafic · Ventes, en une seule vue</small></h1>
+        <img src="https://www.hoffmancables.shop/cdn/shop/files/Logo_Hoffman_Cable.png?width=140" alt="Hoffman Cable">
+        <span>Pilotage<small>Marketing</small></span>
       </a>
-      <div class="top-right">
-        <span class="live-dot" id="active-now" hidden></span>
-        <span id="updated" class="muted"></span>
-        <button class="btn ghost" id="refresh" type="button">Actualiser</button>
-      </div>
-    </div>
-  </header>
+      <nav id="nav">
+        <a href="#overview" data-view="overview"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Vue d'ensemble</a>
 
-  <div class="toolbar">
-    <div class="wrap">
-      <div class="seg" role="group" aria-label="Période" id="period">
-        <button type="button" data-v="day">Jour</button>
-        <button type="button" data-v="week">Semaine</button>
-        <button type="button" data-v="month">Mois</button>
-      </div>
-      <div class="seg" role="group" aria-label="Comparaison" id="compare">
-        <button type="button" data-v="prev">vs période précédente</button>
-        <button type="button" data-v="yoy">vs N-1</button>
-      </div>
-      <span class="range-label" id="range-label"></span>
-      <span class="spacer"></span>
-      <span class="mode demo" id="mode-badge">Démo</span>
-      <button class="btn" id="mode-btn" type="button">Données réelles</button>
-    </div>
-  </div>
+        <p class="group">Acquisition organique</p>
+        <a href="#seo" data-view="seo"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>SEO</a>
+        <a href="#traffic" data-view="traffic"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18"/></svg>Trafic et canaux</a>
 
-  <main class="wrap" id="main">
-    <div class="demo-note" id="demo-note">
-      <strong>Mode démonstration.</strong> Les chiffres ci-dessous sont simulés, mais le dashboard fonctionne déjà avec Google Analytics 4, Search Console et Shopify :
-      les données réelles s'affichent dès que les accès sont configurés sur Vercel (bouton « Données réelles »).
-    </div>
-    <div id="errors"></div>
+        <p class="group">Acquisition payante</p>
+        <a href="#google-ads" data-view="google-ads"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 3 19h18L12 3Z"/></svg>Google Ads<span class="pill">Bientôt</span></a>
+        <a href="#meta-ads" data-view="meta-ads"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 15c2-8 5-8 9 0s7 8 9 0"/></svg>Meta Ads<span class="pill">Bientôt</span></a>
+        <a href="#linkedin-ads" data-view="linkedin-ads"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><path d="M8 10v7M8 7v.01M12 17v-7M12 13c0-2 4-3 4 0v4"/></svg>LinkedIn Ads<span class="pill">Bientôt</span></a>
 
-    <section aria-labelledby="h-kpi">
-      <div class="sec-head"><h2 id="h-kpi">L'essentiel</h2><span class="hint" id="cmp-hint"></span></div>
-      <div class="grid g-kpi" id="kpis"></div>
-    </section>
+        <p class="group">Conversion</p>
+        <a href="#sales" data-view="sales"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18l-7 8v6l-4 2v-8L3 4Z"/></svg>Funnel et ventes</a>
+      </nav>
+      <ul class="sources" id="sources" aria-label="État des sources"></ul>
+    </aside>
 
-    <section aria-labelledby="h-ins">
-      <div class="sec-head"><h2 id="h-ins">Insights automatiques</h2><span class="src">Calculés sur la période</span></div>
-      <div class="grid insights" id="insights"></div>
-    </section>
-
-    <section aria-labelledby="h-evo">
-      <div class="sec-head"><h2 id="h-evo">Évolution</h2><span class="hint" id="evo-hint"></span></div>
-      <div class="card">
-        <div class="tabs" role="tablist" id="metric-tabs"></div>
-        <div class="legend" id="main-legend"></div>
-        <div class="chart-box"><canvas id="main-chart" aria-label="Évolution quotidienne"></canvas></div>
-      </div>
-    </section>
-
-    <section aria-labelledby="h-acq">
-      <div class="sec-head"><h2 id="h-acq">Acquisition et conversion</h2><span class="src">GA4</span></div>
-      <div class="grid g-3-2">
-        <div class="card">
-          <h3>Canaux d'acquisition</h3>
-          <div class="table-wrap"><table id="channels"></table></div>
-          <div class="soon">
-            <div><b>SEO organique</b>Actif · canal principal</div>
-            <div><b>Email / newsletter</b>Stay tuned</div>
-            <div><b>Google Ads / Shopping</b>Stay tuned</div>
-            <div><b>LinkedIn / réseaux</b>Stay tuned</div>
+    <div class="content">
+      <div class="toolbar">
+        <div class="bar-row">
+          <h1 id="view-title">Vue d'ensemble</h1>
+          <div class="bar-right">
+            <span class="live-dot" id="active-now" hidden></span>
+            <span id="updated" class="muted"></span>
+            <button class="btn ghost sm" id="refresh" type="button">Actualiser</button>
+            <span class="mode demo" id="mode-badge">Démo</span>
+            <button class="btn sm" id="mode-btn" type="button">Données réelles</button>
           </div>
         </div>
-        <div class="card">
-          <h3>Entonnoir d'achat</h3>
-          <div class="funnel" id="funnel"></div>
+        <div class="bar-row">
+          <div class="seg" role="group" aria-label="Période" id="period">
+            <button type="button" data-v="day">Jour</button>
+            <button type="button" data-v="week">Semaine</button>
+            <button type="button" data-v="month">Mois</button>
+          </div>
+          <div class="seg" role="group" aria-label="Comparaison" id="compare">
+            <button type="button" data-v="prev">vs période précédente</button>
+            <button type="button" data-v="yoy">vs N-1</button>
+          </div>
+          <span class="range-label" id="range-label"></span>
         </div>
       </div>
-    </section>
 
-    <section aria-labelledby="h-seo">
-      <div class="sec-head"><h2 id="h-seo">SEO organique</h2><span class="src">Google Search Console</span><span class="hint">Les 2 à 3 derniers jours peuvent être incomplets</span></div>
-      <div class="grid g-mini" id="seo-kpis"></div>
-      <div class="grid g-2" style="margin-top:16px">
-        <div class="card">
-          <h3>Clics depuis Google</h3>
-          <div class="legend" id="seo-legend"></div>
-          <div class="chart-box sm"><canvas id="seo-chart" aria-label="Clics Google par jour"></canvas></div>
+      <main id="main">
+        <div class="demo-note" id="demo-note">
+          <strong>Mode démonstration.</strong> Les chiffres sont simulés. Le dashboard est déjà branché sur Google Analytics 4, Search Console et Shopify :
+          les données réelles s'affichent dès que les accès sont configurés sur Vercel (bouton « Données réelles »).
         </div>
-        <div class="card">
-          <h3>Opportunités : requêtes à portée du top 3</h3>
-          <div class="table-wrap"><table id="opps"></table></div>
+        <div id="errors"></div>
+
+        <!-- VUE D'ENSEMBLE -->
+        <div class="view" data-view="overview" data-title="Vue d'ensemble">
+          <section aria-labelledby="h-kpi">
+            <div class="sec-head"><h2 id="h-kpi">L'essentiel</h2><span class="hint" id="cmp-hint"></span></div>
+            <div class="grid g-kpi" id="kpis"></div>
+          </section>
+          <section aria-labelledby="h-ins">
+            <div class="sec-head"><h2 id="h-ins">Insights automatiques</h2><span class="src">Calculés sur la période</span></div>
+            <div class="grid insights" id="insights"></div>
+          </section>
+          <section aria-labelledby="h-evo">
+            <div class="sec-head"><h2 id="h-evo">Évolution</h2><span class="hint" id="evo-hint"></span></div>
+            <div class="card">
+              <div class="tabs" role="tablist" id="metric-tabs"></div>
+              <div class="legend" id="main-legend"></div>
+              <div class="chart-box"><canvas id="main-chart" aria-label="Évolution quotidienne"></canvas></div>
+            </div>
+          </section>
         </div>
-      </div>
-      <div class="grid g-2" style="margin-top:16px">
-        <div class="card"><h3>Top requêtes</h3><div class="table-wrap"><table id="queries"></table></div></div>
-        <div class="card"><h3>Top pages</h3><div class="table-wrap"><table id="pages"></table></div></div>
-      </div>
-    </section>
 
-    <section aria-labelledby="h-shop">
-      <div class="sec-head"><h2 id="h-shop">E-commerce</h2><span class="src">Shopify</span></div>
-      <div class="grid g-mini" id="shop-kpis"></div>
-      <div class="grid g-3-2" style="margin-top:16px">
-        <div class="card"><h3>Produits les plus vendus</h3><div class="table-wrap"><table id="products"></table></div></div>
-        <div class="card"><h3>Clients nouveaux et récurrents</h3><div id="customers"></div></div>
-      </div>
-    </section>
+        <!-- SEO -->
+        <div class="view" data-view="seo" data-title="SEO organique" hidden>
+          <section aria-labelledby="h-seo">
+            <div class="sec-head"><h2 id="h-seo">Visibilité Google</h2><span class="src">Google Search Console</span><span class="hint">Les 2 à 3 derniers jours peuvent être incomplets</span></div>
+            <div class="grid g-mini" id="seo-kpis"></div>
+            <div class="grid g-2 mt">
+              <div class="card">
+                <h3>Clics depuis Google</h3>
+                <div class="legend" id="seo-legend"></div>
+                <div class="chart-box sm"><canvas id="seo-chart" aria-label="Clics Google par jour"></canvas></div>
+              </div>
+              <div class="card">
+                <h3>Opportunités : requêtes à portée du top 3</h3>
+                <div class="table-wrap"><table id="opps"></table></div>
+              </div>
+            </div>
+            <div class="grid g-2 mt">
+              <div class="card"><h3>Top requêtes</h3><div class="table-wrap"><table id="queries"></table></div></div>
+              <div class="card"><h3>Top pages</h3><div class="table-wrap"><table id="pages"></table></div></div>
+            </div>
+          </section>
+        </div>
 
-    <section aria-labelledby="h-aud">
-      <div class="sec-head"><h2 id="h-aud">Audience et engagement</h2><span class="src">GA4</span></div>
-      <div class="grid g-mini" id="aud-kpis"></div>
-      <div class="grid g-2" style="margin-top:16px">
-        <div class="card"><h3>Appareils</h3><div class="table-wrap"><table id="devices"></table></div></div>
-        <div class="card"><h3>Pages d'entrée</h3><div class="table-wrap"><table id="landing"></table></div></div>
-      </div>
-    </section>
-  </main>
+        <!-- TRAFIC ET CANAUX -->
+        <div class="view" data-view="traffic" data-title="Trafic et canaux" hidden>
+          <section aria-labelledby="h-acq">
+            <div class="sec-head"><h2 id="h-acq">Canaux d'acquisition</h2><span class="src">GA4</span></div>
+            <div class="card">
+              <div class="table-wrap"><table id="channels"></table></div>
+              <div class="soon">
+                <div><b>SEO organique</b>Actif · canal principal</div>
+                <div><b>Email / newsletter</b>Stay tuned</div>
+                <div><b>Acquisition payante</b>Stay tuned</div>
+                <div><b>Réseaux sociaux</b>Stay tuned</div>
+              </div>
+            </div>
+          </section>
+          <section aria-labelledby="h-aud">
+            <div class="sec-head"><h2 id="h-aud">Audience et engagement</h2><span class="src">GA4</span></div>
+            <div class="grid g-mini" id="aud-kpis"></div>
+            <div class="grid g-2 mt">
+              <div class="card"><h3>Appareils</h3><div class="table-wrap"><table id="devices"></table></div></div>
+              <div class="card"><h3>Pages d'entrée</h3><div class="table-wrap"><table id="landing"></table></div></div>
+            </div>
+          </section>
+        </div>
 
-  <footer>
-    <div class="wrap">
-      <ul id="sources"></ul>
-      <small>Fuseau Europe/Paris · journée complète la plus récente : hier · mise à jour toutes les 5 min en mode réel</small>
+        <!-- ACQUISITION PAYANTE : stay tuned (contenu généré par app.js) -->
+        <div class="view" data-view="google-ads" data-title="Google Ads" hidden></div>
+        <div class="view" data-view="meta-ads" data-title="Meta Ads" hidden></div>
+        <div class="view" data-view="linkedin-ads" data-title="LinkedIn Ads" hidden></div>
+
+        <!-- FUNNEL ET VENTES -->
+        <div class="view" data-view="sales" data-title="Funnel et ventes" hidden>
+          <section aria-labelledby="h-funnel">
+            <div class="sec-head"><h2 id="h-funnel">Entonnoir d'achat</h2><span class="src">GA4</span></div>
+            <div class="card"><div class="funnel" id="funnel"></div></div>
+          </section>
+          <section aria-labelledby="h-shop">
+            <div class="sec-head"><h2 id="h-shop">E-commerce</h2><span class="src">Shopify</span></div>
+            <div class="grid g-mini" id="shop-kpis"></div>
+            <div class="grid g-3-2 mt">
+              <div class="card"><h3>Produits les plus vendus</h3><div class="table-wrap"><table id="products"></table></div></div>
+              <div class="card"><h3>Clients nouveaux et récurrents</h3><div id="customers"></div></div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <footer>
+        <small>Fuseau Europe/Paris · journée complète la plus récente : hier · mise à jour toutes les 5 min en mode réel</small>
+      </footer>
     </div>
-  </footer>
+  </div>
 
   <dialog id="login">
     <form method="dialog" id="login-form">

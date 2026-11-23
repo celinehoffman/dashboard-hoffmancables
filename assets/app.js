@@ -379,10 +379,78 @@ $('#metric-tabs').addEventListener('click', (e) => {
 });
 $('#refresh').addEventListener('click', () => load({ fresh: true }));
 
+/* ---------- Acquisition payante : pages « Stay tuned » ---------- */
+
+const PAID = {
+  'google-ads': {
+    name: 'Google Ads',
+    pitch: 'Search et Shopping sur les requêtes produits (U-1000 R2V, AR2V, H07RN-F…) pour accélérer pendant que le SEO monte en puissance.',
+    kpis: ['Dépense', 'Impressions', 'Clics', 'CTR', 'CPC', 'Conversions', 'CPA', 'ROAS'],
+    plan: [['Source', 'API Google Ads, compte lié à GA4'], ['Suivi', 'Conversions d\'achat Shopify importées dans Google Ads'], ['Vue prévue', 'Dépense et ROAS par campagne, termes de recherche, comparaison SEO / payant sur les mêmes requêtes']],
+  },
+  'meta-ads': {
+    name: 'Meta Ads',
+    pitch: 'Facebook et Instagram pour le retargeting des visiteurs qui ont consulté une fiche câble sans acheter.',
+    kpis: ['Dépense', 'Impressions', 'Clics', 'CTR', 'CPC', 'Leads', 'CPA', 'ROAS'],
+    plan: [['Source', 'Marketing API Meta (lecture seule)'], ['Suivi', 'Pixel et Conversions API via l\'app Shopify Facebook & Instagram'], ['Vue prévue', 'Dépense et ventes par campagne, répartition par placement, fréquence']],
+  },
+  'linkedin-ads': {
+    name: 'LinkedIn Ads',
+    pitch: 'Ciblage B2B des installateurs, tableautiers et acheteurs industriels pour l\'offre sur devis Hoffman et Boulanger.',
+    kpis: ['Dépense', 'Impressions', 'Clics', 'CTR', 'CPC', 'Leads', 'Coût / lead', 'Taux de formulaire'],
+    plan: [['Source', 'API LinkedIn Marketing'], ['Suivi', 'Insight Tag + formulaires Lead Gen'], ['Vue prévue', 'Leads par poste et secteur, coût par lead, demandes de devis']],
+  },
+};
+
+function renderPaid() {
+  for (const [id, p] of Object.entries(PAID)) {
+    document.querySelector(`.view[data-view="${id}"]`).innerHTML = `
+      <section>
+        <div class="tuned">
+          <div class="kicker">Stay tuned</div>
+          <h2>${p.name} arrive bientôt</h2>
+          <p>Ce levier n'est pas encore activé chez Hoffman Cable. ${p.pitch}</p>
+        </div>
+      </section>
+      <section>
+        <div class="sec-head"><h2>Indicateurs qui s'afficheront ici</h2><span class="src">${p.name}</span></div>
+        <div class="grid g-kpi ghost-kpis">${p.kpis.map((k) => `<div class="card kpi"><div class="label"><span>${k}</span><span class="tag">${p.name}</span></div><div class="value">—</div><div class="foot">En attente du lancement</div></div>`).join('')}</div>
+      </section>
+      <section>
+        <div class="sec-head"><h2>Ce qu'il faudra brancher</h2></div>
+        <div class="plan">${p.plan.map(([t, d]) => `<div class="card"><h3>${t}</h3><p>${d}</p></div>`).join('')}</div>
+      </section>`;
+  }
+}
+
+/* ---------- Navigation entre les parties ---------- */
+
+function showView() {
+  const views = [...document.querySelectorAll('.view')];
+  const id = location.hash.slice(1);
+  const target = views.find((v) => v.dataset.view === id) || views[0];
+  views.forEach((v) => { v.hidden = v !== target; });
+  document.querySelectorAll('#nav a').forEach((a) => {
+    if (a.dataset.view === target.dataset.view) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  });
+  $('#view-title').textContent = target.dataset.title;
+  document.title = `${target.dataset.title} · Pilotage marketing Hoffman Cable`;
+  // Les filtres de période n'ont pas de sens sur les pages « Stay tuned »
+  const paid = target.dataset.view in PAID;
+  $('#period').hidden = paid; $('#compare').hidden = paid; $('#range-label').hidden = paid;
+  document.body.classList.toggle('paid-view', paid);
+  // Les graphiques créés dans une partie masquée doivent recalculer leur taille
+  requestAnimationFrame(() => Object.values(charts).forEach((c) => c.resize()));
+  window.scrollTo({ top: 0 });
+}
+window.addEventListener('hashchange', showView);
+
 /* ---------- Démarrage ---------- */
 
 (async function init() {
   if (typeof Chart !== 'undefined') Chart.defaults.font.family = 'Assistant, system-ui, sans-serif';
+  renderPaid();
+  showView();
   try {
     const st = await fetch('/api/status').then((r) => (r.ok ? r.json() : null));
     state.liveAvailable = Boolean(st?.liveAvailable);
