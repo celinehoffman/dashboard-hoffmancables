@@ -179,9 +179,7 @@ function demoShopify(range) {
   const agg = (p) => {
     const revenue = sumOver(p, (d) => d.shopRevenue), orders = sumOver(p, (d) => d.orders);
     const refunded = sumOver(p, (d) => d.refunded);
-    const r = rng(`cust-${p.start}`);
-    const fresh = Math.round(orders * between(r, 0.6, 0.75));
-    return { revenue, orders, aov: orders ? revenue / orders : 0, refundRate: revenue ? refunded / revenue * 100 : 0, newCustomers: fresh, returningCustomers: orders - fresh };
+    return { revenue, orders, aov: orders ? revenue / orders : 0, refundRate: revenue ? refunded / revenue * 100 : 0 };
   };
   const a = { cur: agg(range.cur), prev: agg(range.prev), yoy: agg(range.yoy) };
   const k = (n) => ({ cur: a.cur[n], prev: a.prev[n], yoy: a.yoy[n] });
@@ -191,7 +189,7 @@ function demoShopify(range) {
   };
   const r = rng(`prod-${range.cur.start}`);
   return {
-    kpi: { revenue: k('revenue'), orders: k('orders'), aov: k('aov'), refundRate: k('refundRate'), newCustomers: k('newCustomers'), returningCustomers: k('returningCustomers') },
+    kpi: { revenue: k('revenue'), orders: k('orders'), aov: k('aov'), refundRate: k('refundRate') },
     series: { cur: series(range.chart), prev: range.key === 'day' ? null : series(range.prev), yoy: range.key === 'day' ? null : series(range.yoy) },
     products: PRODUCTS.map(([title, share, unit]) => {
       const revenue = a.cur.revenue * share * between(r, 0.75, 1.25);

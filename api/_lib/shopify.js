@@ -38,7 +38,6 @@ const ORDERS = `query Orders($q: String!, $after: String) {
       createdAt cancelledAt test
       totalPriceSet { shopMoney { amount } }
       totalRefundedSet { shopMoney { amount } }
-      customer { numberOfOrders }
       lineItems(first: 10) { nodes { title quantity originalTotalSet { shopMoney { amount } } } }
     }
   }
@@ -71,17 +70,16 @@ async function ordersBetween(p) {
 const paris = new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' });
 const amount = (s) => Number(s?.shopMoney?.amount || 0);
 
+// Confidentialité : on ne lit aucune donnée client (nom, e-mail, historique).
+// Seul le scope read_orders est nécessaire.
 function aggregate(orders) {
-  let revenue = 0, refunded = 0, fresh = 0, returning = 0;
+  let revenue = 0, refunded = 0;
   for (const o of orders) {
     revenue += amount(o.totalPriceSet);
     refunded += amount(o.totalRefundedSet);
-    if (!o.customer) continue;
-    // numberOfOrders = total actuel du client : approximation « 1re commande ».
-    if (Number(o.customer.numberOfOrders) <= 1) fresh++; else returning++;
   }
   const n = orders.length;
-  return { revenue, orders: n, aov: n ? revenue / n : 0, refundRate: revenue ? (refunded / revenue) * 100 : 0, newCustomers: fresh, returningCustomers: returning };
+  return { revenue, orders: n, aov: n ? revenue / n : 0, refundRate: revenue ? (refunded / revenue) * 100 : 0 };
 }
 
 export async function fetchShopify(range) {
@@ -116,10 +114,7 @@ export async function fetchShopify(range) {
   }
 
   return {
-    kpi: {
-      revenue: k('revenue'), orders: k('orders'), aov: k('aov'), refundRate: k('refundRate'),
-      newCustomers: k('newCustomers'), returningCustomers: k('returningCustomers'),
-    },
+    kpi: { revenue: k('revenue'), orders: k('orders'), aov: k('aov'), refundRate: k('refundRate') },
     series: {
       cur: seriesOf(range.chart),
       prev: range.key === 'day' ? null : seriesOf(range.prev),

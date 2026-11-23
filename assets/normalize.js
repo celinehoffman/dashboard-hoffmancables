@@ -38,8 +38,6 @@ export function normalize({ mode, range, ga4, gsc, shopify, sources }) {
     gscCtr: c.gscCtr || EMPTY,
     gscPosition: c.gscPosition || EMPTY,
     organicSessions: organic(ga4),
-    newCustomers: s.newCustomers || EMPTY,
-    returningCustomers: s.returningCustomers || EMPTY,
     refundRate: s.refundRate || EMPTY,
   };
 

@@ -11,6 +11,25 @@ import { configured } from './_lib/config.js';
 const cache = new Map(); // range -> { at, body }
 const TTL = 5 * 60 * 1000;
 
+// Anti-force brute : 5 essais ratés par adresse IP et par 15 minutes, puis blocage.
+const failures = new Map(); // ip -> { count, until }
+const MAX_FAILS = 5;
+const WINDOW = 15 * 60 * 1000;
+const clientIp = (req) => String(req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || 'inconnue').split(',')[0].trim();
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function blocked(ip) {
+  const f = failures.get(ip);
+  if (!f) return false;
+  if (Date.now() > f.until) { failures.delete(ip); return false; }
+  return f.count >= MAX_FAILS;
+}
+function recordFailure(ip) {
+  const f = failures.get(ip);
+  if (!f || Date.now() > f.until) failures.set(ip, { count: 1, until: Date.now() + WINDOW });
+  else f.count += 1;
+}
+
 function authorized(req) {
   const expected = process.env.DASHBOARD_PASSWORD;
   const given = req.headers['x-dashboard-key'];
@@ -22,10 +41,18 @@ function authorized(req) {
 
 export default async function handler(req, res) {
   res.setHeader('cache-control', 'private, no-store');
-  if (!process.env.DASHBOARD_PASSWORD) {
-    return res.status(503).json({ error: 'Données réelles non activées : DASHBOARD_PASSWORD absent sur Vercel.' });
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Méthode non autorisée.' });
+  if (!process.env.DASHBOARD_PASSWORD || process.env.DASHBOARD_PASSWORD.length < 12) {
+    return res.status(503).json({ error: 'Données réelles non activées : DASHBOARD_PASSWORD absent ou trop court (12 caractères minimum).' });
   }
-  if (!authorized(req)) return res.status(401).json({ error: 'Mot de passe incorrect.' });
+  const ip = clientIp(req);
+  if (blocked(ip)) return res.status(429).json({ error: 'Trop d\'essais. Réessaie dans 15 minutes.' });
+  if (!authorized(req)) {
+    recordFailure(ip);
+    await wait(1000); // ralentit les essais automatiques
+    return res.status(401).json({ error: 'Mot de passe incorrect.' });
+  }
+  failures.delete(ip);
 
   const key = ['day', 'week', 'month'].includes(req.query.range) ? req.query.range : 'week';
   const hit = cache.get(key);

@@ -19,7 +19,7 @@ const state = {
   period: store.get('hc.period') || 'week',
   cmp: store.get('hc.cmp') || 'prev',
   mode: 'demo',
-  key: store.get('hc.key', sessionStorage),
+  key: null, // gardé en mémoire uniquement, jamais enregistré dans le navigateur
   metric: 'revenue',
   data: null,
   liveAvailable: false,
@@ -36,7 +36,7 @@ async function load({ fresh = false } = {}) {
     if (state.mode === 'live') {
       const res = await fetch(`/api/data?range=${state.period}${fresh ? '&fresh=1' : ''}`, { headers: { 'x-dashboard-key': state.key || '' } });
       const body = await res.json().catch(() => ({}));
-      if (res.status === 401) { setMode('demo'); store.set('hc.key', null, sessionStorage); openLogin('Mot de passe refusé.'); return; }
+      if (res.status === 401) { setMode('demo'); state.key = null; openLogin('Mot de passe refusé.'); return; }
       if (!res.ok) throw new Error(body.error || `Erreur ${res.status}`);
       state.data = body;
     } else {
@@ -300,13 +300,10 @@ function render() {
     { h: 'Qté', r: 1, v: (p) => fmt.int(p.qty) },
     { h: 'CA', r: 1, v: (p) => fmt.eur0(p.revenue) },
   ], d.products.slice(0, 10));
-  const nw = k.newCustomers.cur || 0, rt = k.returningCustomers.cur || 0, tot = nw + rt;
-  $('#customers').innerHTML = tot ? `
-    <div class="value num" style="font-size:30px">${fmt.pct((rt / tot) * 100, 0)} <span class="muted" style="font-size:15px">de clients récurrents</span></div>
-    <div class="stack" role="img" aria-label="${nw} nouveaux, ${rt} récurrents"><div class="a" style="width:${(nw / tot) * 100}%"></div><div class="b" style="width:${(rt / tot) * 100}%"></div></div>
-    <div class="stack-legend"><span><i style="background:${BRAND}"></i>Nouveaux : <b class="num">${fmt.int(nw)}</b> ${deltaBadge(k.newCustomers, KPI_DEFS.newCustomers)}</span><span><i style="background:#121212"></i>Récurrents : <b class="num">${fmt.int(rt)}</b></span></div>
-    <p class="muted" style="font-size:13px;margin:14px 0 0">Clients identifiés uniquement (hors commandes invité).</p>`
-    : '<p class="muted">Aucune commande client sur la période.</p>';
+  $('#customers').innerHTML = `
+    <p style="margin:0 0 10px"><b>Aucune donnée personnelle client n'est lue par ce dashboard.</b></p>
+    <p class="muted" style="margin:0;font-size:14px">L'accès Shopify est limité aux commandes (montants, dates, produits) : ni noms, ni e-mails, ni adresses.
+    Le suivi nouveaux / récurrents pourra être ajouté plus tard si besoin, avec une autorisation dédiée.</p>`;
 
   // Audience
   $('#aud-kpis').innerHTML = ['users', 'engagementRate', 'avgSessionDuration', 'pagesPerSession'].map(tile).join('');
@@ -344,7 +341,6 @@ function openLogin(msg = '') {
 $('#login-form').addEventListener('submit', (e) => {
   e.preventDefault();
   state.key = $('#pwd').value;
-  store.set('hc.key', state.key, sessionStorage);
   $('#login').close();
   setMode('live');
   load({ fresh: true });
@@ -352,7 +348,7 @@ $('#login-form').addEventListener('submit', (e) => {
 $('#login-cancel').addEventListener('click', () => $('#login').close());
 
 $('#mode-btn').addEventListener('click', () => {
-  if (state.mode === 'live') { setMode('demo'); store.set('hc.key', null, sessionStorage); state.key = null; load(); return; }
+  if (state.mode === 'live') { setMode('demo'); state.key = null; load(); return; }
   if (!state.liveAvailable) {
     $('#errors').innerHTML = '<div class="error-note"><strong>Données réelles non configurées.</strong> Ajoute DASHBOARD_PASSWORD et les accès GA4 / Search Console / Shopify dans les variables d\'environnement Vercel (voir README).</div>';
     return;
@@ -455,6 +451,7 @@ window.addEventListener('hashchange', showView);
     const st = await fetch('/api/status').then((r) => (r.ok ? r.json() : null));
     state.liveAvailable = Boolean(st?.liveAvailable);
   } catch { state.liveAvailable = false; }
-  if (state.liveAvailable && state.key) setMode('live'); else setMode('demo');
+  store.set('hc.key', null, sessionStorage); // efface un mot de passe mémorisé par une ancienne version
+  setMode('demo');
   load();
 })();
