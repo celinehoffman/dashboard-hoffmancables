@@ -1,0 +1,8 @@
+{
+  "name": "dashboard-hoffmancables",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Dashboard marketing unifié Hoffman Cable : GA4, Search Console, Shopify",
+  "engines": { "node": ">=20" }
+}

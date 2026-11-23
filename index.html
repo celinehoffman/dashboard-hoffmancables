@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pilotage marketing · Hoffman Cable</title>
+  <meta name="description" content="Tableau de bord marketing unifié de hoffmancables.shop : GA4, Search Console et Shopify.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="https://www.hoffmancables.shop/cdn/shop/files/Logo_Hoffman_Cable.png?width=64">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+  <div class="announce"><strong>Hoffman Cable</strong> · Tableau de bord marketing de hoffmancables.shop</div>
+
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="https://www.hoffmancables.shop/" target="_blank" rel="noopener">
+        <img src="https://www.hoffmancables.shop/cdn/shop/files/Logo_Hoffman_Cable.png?width=180" alt="Hoffman Cable">
+        <h1>Pilotage marketing <small>SEO · Trafic · Ventes, en une seule vue</small></h1>
+      </a>
+      <div class="top-right">
+        <span class="live-dot" id="active-now" hidden></span>
+        <span id="updated" class="muted"></span>
+        <button class="btn ghost" id="refresh" type="button">Actualiser</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="wrap">
+      <div class="seg" role="group" aria-label="Période" id="period">
+        <button type="button" data-v="day">Jour</button>
+        <button type="button" data-v="week">Semaine</button>
+        <button type="button" data-v="month">Mois</button>
+      </div>
+      <div class="seg" role="group" aria-label="Comparaison" id="compare">
+        <button type="button" data-v="prev">vs période précédente</button>
+        <button type="button" data-v="yoy">vs N-1</button>
+      </div>
+      <span class="range-label" id="range-label"></span>
+      <span class="spacer"></span>
+      <span class="mode demo" id="mode-badge">Démo</span>
+      <button class="btn" id="mode-btn" type="button">Données réelles</button>
+    </div>
+  </div>
+
+  <main class="wrap" id="main">
+    <div class="demo-note" id="demo-note">
+      <strong>Mode démonstration.</strong> Les chiffres ci-dessous sont simulés, mais le dashboard fonctionne déjà avec Google Analytics 4, Search Console et Shopify :
+      les données réelles s'affichent dès que les accès sont configurés sur Vercel (bouton « Données réelles »).
+    </div>
+    <div id="errors"></div>
+
+    <section aria-labelledby="h-kpi">
+      <div class="sec-head"><h2 id="h-kpi">L'essentiel</h2><span class="hint" id="cmp-hint"></span></div>
+      <div class="grid g-kpi" id="kpis"></div>
+    </section>
+
+    <section aria-labelledby="h-ins">
+      <div class="sec-head"><h2 id="h-ins">Insights automatiques</h2><span class="src">Calculés sur la période</span></div>
+      <div class="grid insights" id="insights"></div>
+    </section>
+
+    <section aria-labelledby="h-evo">
+      <div class="sec-head"><h2 id="h-evo">Évolution</h2><span class="hint" id="evo-hint"></span></div>
+      <div class="card">
+        <div class="tabs" role="tablist" id="metric-tabs"></div>
+        <div class="legend" id="main-legend"></div>
+        <div class="chart-box"><canvas id="main-chart" aria-label="Évolution quotidienne"></canvas></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-acq">
+      <div class="sec-head"><h2 id="h-acq">Acquisition et conversion</h2><span class="src">GA4</span></div>
+      <div class="grid g-3-2">
+        <div class="card">
+          <h3>Canaux d'acquisition</h3>
+          <div class="table-wrap"><table id="channels"></table></div>
+          <div class="soon">
+            <div><b>SEO organique</b>Actif · canal principal</div>
+            <div><b>Email / newsletter</b>Stay tuned</div>
+            <div><b>Google Ads / Shopping</b>Stay tuned</div>
+            <div><b>LinkedIn / réseaux</b>Stay tuned</div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Entonnoir d'achat</h3>
+          <div class="funnel" id="funnel"></div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-seo">
+      <div class="sec-head"><h2 id="h-seo">SEO organique</h2><span class="src">Google Search Console</span><span class="hint">Les 2 à 3 derniers jours peuvent être incomplets</span></div>
+      <div class="grid g-mini" id="seo-kpis"></div>
+      <div class="grid g-2" style="margin-top:16px">
+        <div class="card">
+          <h3>Clics depuis Google</h3>
+          <div class="legend" id="seo-legend"></div>
+          <div class="chart-box sm"><canvas id="seo-chart" aria-label="Clics Google par jour"></canvas></div>
+        </div>
+        <div class="card">
+          <h3>Opportunités : requêtes à portée du top 3</h3>
+          <div class="table-wrap"><table id="opps"></table></div>
+        </div>
+      </div>
+      <div class="grid g-2" style="margin-top:16px">
+        <div class="card"><h3>Top requêtes</h3><div class="table-wrap"><table id="queries"></table></div></div>
+        <div class="card"><h3>Top pages</h3><div class="table-wrap"><table id="pages"></table></div></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-shop">
+      <div class="sec-head"><h2 id="h-shop">E-commerce</h2><span class="src">Shopify</span></div>
+      <div class="grid g-mini" id="shop-kpis"></div>
+      <div class="grid g-3-2" style="margin-top:16px">
+        <div class="card"><h3>Produits les plus vendus</h3><div class="table-wrap"><table id="products"></table></div></div>
+        <div class="card"><h3>Clients nouveaux et récurrents</h3><div id="customers"></div></div>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-aud">
+      <div class="sec-head"><h2 id="h-aud">Audience et engagement</h2><span class="src">GA4</span></div>
+      <div class="grid g-mini" id="aud-kpis"></div>
+      <div class="grid g-2" style="margin-top:16px">
+        <div class="card"><h3>Appareils</h3><div class="table-wrap"><table id="devices"></table></div></div>
+        <div class="card"><h3>Pages d'entrée</h3><div class="table-wrap"><table id="landing"></table></div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <ul id="sources"></ul>
+      <small>Fuseau Europe/Paris · journée complète la plus récente : hier · mise à jour toutes les 5 min en mode réel</small>
+    </div>
+  </footer>
+
+  <dialog id="login">
+    <form method="dialog" id="login-form">
+      <h3>Données réelles</h3>
+      <p>Saisis le mot de passe du dashboard (variable DASHBOARD_PASSWORD sur Vercel) pour afficher les chiffres réels.</p>
+      <label class="sr-only" for="pwd">Mot de passe</label>
+      <input id="pwd" type="password" autocomplete="current-password" required>
+      <div class="err" id="login-err" role="alert"></div>
+      <div class="actions">
+        <button class="btn ghost" type="button" id="login-cancel">Annuler</button>
+        <button class="btn" type="submit">Afficher</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="assets/app.js"></script>
+</body>
+</html>
